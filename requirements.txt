@@ -3,3 +3,4 @@ statsmodels
 scikit-learn
 keras-tcn
 joblib
+plotly
