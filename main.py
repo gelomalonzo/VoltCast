@@ -137,7 +137,8 @@ if st.session_state.show_results:
     season_df = pd.read_csv("assets/season_df.csv").set_index("DATE")
     trend_scaler = joblib.load("assets/trend_scaler.pkl")
     scaler = joblib.load("assets/scaler.pkl")
-    forecast_model = load_model("assets/tcn.h5", custom_objects={"TCN": TCN})
+    forecast_model = load_model("assets/tcn.h5", custom_objects={"TCN": TCN}, compile=False)
+    # forecast_model.compile()
     trend_model = load_model("assets/lstm_trend.h5")
     
     # preprocess
