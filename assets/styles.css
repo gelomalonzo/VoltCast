@@ -1,0 +1,40 @@
+/* sidebar section */
+.eczjsme11 {
+    width: 400px !important;
+}
+
+/* sidebar banner */
+.st-emotion-cache-dvne4q 
+{
+    padding: 0 !important;
+}
+
+/* sidebar close button */
+.eczjsme2 {
+    display: none !important;
+}
+
+/* deploy button */
+/* .stDeployButton {
+    display: none !important;
+} */
+
+/* sidebar resize control */
+div[style="position: absolute; user-select: none; width: 8px; height: 100%; top: 0px; cursor: col-resize; right: -6px;"] {
+    display: none;
+}
+
+/* submit form buttons */
+div[data-testid="stFormSubmitButton"] {
+    text-align: center;
+}
+
+/* file upload dropboxes */
+.e1b2p2ww15 {
+    flex-direction: row !important;
+}
+
+/* file upload instructions */
+.e1b2p2ww14 {
+    margin-bottom: 0 !important;
+}
