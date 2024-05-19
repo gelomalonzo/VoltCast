@@ -24,7 +24,7 @@ joblib==1.4.2
 jsonschema==4.22.0
 jsonschema-specifications==2023.12.1
 keras==2.15.0
-keras-tcn==2.15.0
+keras-tcn==3.5.0
 libclang==18.1.1
 Markdown==3.6
 markdown-it-py==3.0.0
