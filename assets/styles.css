@@ -15,9 +15,9 @@
 }
 
 /* deploy button */
-/* .stDeployButton {
+.stDeployButton {
     display: none !important;
-} */
+}
 
 /* sidebar resize control */
 div[style="position: absolute; user-select: none; width: 8px; height: 100%; top: 0px; cursor: col-resize; right: -6px;"] {
