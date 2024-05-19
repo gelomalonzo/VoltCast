@@ -2,6 +2,7 @@ streamlit
 statsmodels
 scikit-learn
 keras-tcn
+keras==2.15.0
 tensorflow==2.15.0
 joblib
 plotly
