@@ -56,41 +56,41 @@ def revert_detrend(df:pd.DataFrame, trend_scaler:MinMaxScaler, trend_df:pd.DataF
 
     temp_trend_df[df.columns] = trend_scaler.inverse_transform(temp_trend_df[df.columns])
     
-    # st.subheader("Trend Predictions")
-    # for col in numeric_cols:
-    #     fig = go.Figure()
-    #     fig.add_trace(go.Scatter(
-    #         x=trend_df.index,
-    #         y=trend_df[col],
-    #         mode="lines",
-    #         name="Past Data"
-    #     ))
-    #     fig.add_trace(go.Scatter(
-    #         x=temp_trend_df.index,
-    #         y=temp_trend_df[col],
-    #         mode="lines",
-    #         name="Forecasted"
-    #     ))
-    #     # if actual_data_file:
-    #     #     fig.add_trace(go.Scatter(
-    #     #         x=actual_data_df.index,
-    #     #         y=actual_data_df[col],
-    #     #         mode="lines",
-    #     #         name="Actual"
-    #     #     ))
-    #     fig.update_layout(
-    #         title=f"Trend Forecasts for {col}",
-    #         xaxis_title="Date",
-    #         yaxis_title="Value",
-    #         template="plotly_white"
-    #     )
-    #     st.plotly_chart(fig, use_container_width=True)
+    st.write("---")
+    st.subheader("Trend Predictions")
+    for col in numeric_cols:
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(
+            x=trend_df.index,
+            y=trend_df[col],
+            mode="lines",
+            name="Past Data"
+        ))
+        fig.add_trace(go.Scatter(
+            x=temp_trend_df.index,
+            y=temp_trend_df[col],
+            mode="lines",
+            name="Forecasted"
+        ))
+        # if actual_data_file:
+        #     fig.add_trace(go.Scatter(
+        #         x=actual_data_df.index,
+        #         y=actual_data_df[col],
+        #         mode="lines",
+        #         name="Actual"
+        #     ))
+        fig.update_layout(
+            title=f"Trend Forecasts for {col}",
+            xaxis_title="Date",
+            yaxis_title="Value",
+            template="plotly_white"
+        )
+        st.plotly_chart(fig, use_container_width=True)
     
     for index, row in df.iterrows():
         for col in df.columns:
             detrended_df.loc[index, col] = detrended_df.loc[index, col] + temp_trend_df.loc[index, col]
-            
-    # st.write("---")
+
     return detrended_df
 
 def get_input_sequences(df:pd.DataFrame) -> np.ndarray:
@@ -201,9 +201,7 @@ if st.session_state.show_results:
     # import models
     numeric_cols = ["LUZVIS PRICE (PHP/KWH)", "LUZON DEMAND (MW)", "VISAYAS DEMAND (MW)", "LUZON SUPPLY (MW)", "VISAYAS SUPPLY (MW)"]
     scaler = joblib.load("assets/scaler2.pkl")
-    init_gru_model = load_model("assets/init_gru.h5") # for "LUZON DEMAND (MW)", "VISAYAS DEMAND (MW)", "LUZON SUPPLY (MW)"
-    tuned_gru_model = load_model("assets/tuned_gru.h5") # for "LUZVIS PRICE (PHP/KWH)"
-    init_lstm_model = load_model("assets/init_lstm.h5") # for "VISAYAS SUPPLY (MW)"
+    forecast_model = load_model("assets/init_gru.h5")
     
     # preprocess
     actual_past_data_df = past_data_df.copy()
@@ -213,35 +211,11 @@ if st.session_state.show_results:
     
     # forecast 180 days ahead
     forecast_dates = [past_data_df.index[-1] + timedelta(days=i) for i in range(1, 180 + 1)]
-    
-    init_gru_preds = init_gru_model.predict(X)
-    init_gru_preds = compress_to_timestep(init_gru_preds)[-180:]
-    init_gru_preds_df = pd.DataFrame(init_gru_preds, index=pd.to_datetime(forecast_dates), columns=numeric_cols)
-    init_gru_preds_df.index = init_gru_preds_df.index.date
-    init_gru_preds_df[numeric_cols] = scaler.inverse_transform(init_gru_preds_df[numeric_cols])
-    
-    tuned_gru_preds = tuned_gru_model.predict(X)
-    tuned_gru_preds = compress_to_timestep(tuned_gru_preds)[-180:]
-    tuned_gru_preds_df = pd.DataFrame(tuned_gru_preds, index=pd.to_datetime(forecast_dates), columns=numeric_cols)
-    tuned_gru_preds_df.index = tuned_gru_preds_df.index.date
-    tuned_gru_preds_df[numeric_cols] = scaler.inverse_transform(tuned_gru_preds_df[numeric_cols])
-    
-    init_lstm_preds = init_lstm_model.predict(X)
-    init_lstm_preds = compress_to_timestep(init_lstm_preds)[-180:]
-    init_lstm_preds_df = pd.DataFrame(init_lstm_preds, index=pd.to_datetime(forecast_dates), columns=numeric_cols)
-    init_lstm_preds_df.index = init_lstm_preds_df.index.date
-    init_lstm_preds_df[numeric_cols] = scaler.inverse_transform(init_lstm_preds_df[numeric_cols])
-    
-    preds_df = init_gru_preds_df.copy()
-    # preds_df["LUZON DEMAND (MW)"] = init_gru_preds_df["LUZON DEMAND (MW)"]
-    # preds_df["VISAYAS DEMAND (MW)"] = init_gru_preds_df["VISAYAS DEMAND (MW)"]
-    preds_df["LUZVIS PRICE (PHP/KWH)"] = init_lstm_preds_df["LUZVIS PRICE (PHP/KWH)"]
-    # preds_df["LUZON SUPPLY (MW)"] = init_gru_preds_df["LUZON SUPPLY (MW)"]
-    preds_df["VISAYAS SUPPLY (MW)"] = init_lstm_preds_df["VISAYAS SUPPLY (MW)"]
-    
-    del init_gru_preds, init_gru_preds_df
-    del tuned_gru_preds, tuned_gru_preds_df
-    del init_lstm_preds, init_lstm_preds_df
+    preds = forecast_model.predict(X)
+    preds = compress_to_timestep(preds)[-180:]
+    preds_df = pd.DataFrame(preds, index=pd.to_datetime(forecast_dates), columns=numeric_cols)
+    preds_df.index = preds_df.index.date
+    preds_df[numeric_cols] = scaler.inverse_transform(preds_df[numeric_cols])
     
     st.subheader("Forecasted Values")
     st.dataframe(preds_df, use_container_width=True)
